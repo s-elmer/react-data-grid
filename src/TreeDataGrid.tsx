@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import type { Key } from 'react';
 
 import { useLatestFunc } from './hooks';
-import { assertIsValidKeyGetter, isCtrlKeyHeldDown } from './utils';
+import { assertIsValidKeyGetter } from './utils';
 import type {
   CellKeyboardEvent,
   CellKeyDownArgs,
@@ -318,12 +318,6 @@ export function TreeDataGrid<R, SR = unknown, K extends Key = Key>({
         selectCell({ idx, rowIdx: parentRowAndIndex[1] });
       }
     }
-
-    // Prevent copy/paste on group rows
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    if (isCtrlKeyHeldDown(event) && (event.keyCode === 67 || event.keyCode === 86)) {
-      event.preventGridDefault();
-    }
   }
 
   function handleRowsChange(updatedRows: R[], { indexes, column }: RowsChangeData<R, SR>) {
@@ -361,7 +355,6 @@ export function TreeDataGrid<R, SR = unknown, K extends Key = Key>({
       onCellContextMenu,
       onRowChange,
       lastFrozenColumnIndex,
-      copiedCellIdx,
       draggedOverCellIdx,
       setDraggedOverRowIdx,
       selectedCellEditor,
@@ -400,7 +393,6 @@ export function TreeDataGrid<R, SR = unknown, K extends Key = Key>({
       onCellContextMenu,
       onRowChange,
       lastFrozenColumnIndex,
-      copiedCellIdx,
       draggedOverCellIdx,
       setDraggedOverRowIdx,
       selectedCellEditor
