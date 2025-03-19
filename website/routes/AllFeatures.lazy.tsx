@@ -3,7 +3,7 @@ import { createLazyFileRoute } from '@tanstack/react-router';
 import { css } from '@linaria/core';
 import clsx from 'clsx';
 
-import DataGrid, { SelectColumn, textEditor } from '../../src';
+import { DataGrid, SelectColumn, textEditor } from '../../src';
 import type { CalculatedColumn, CellCopyPasteEvent, Column, FillEvent } from '../../src';
 import { textEditorClassname } from '../../src/editors/textEditor';
 import { useDirection } from '../directionContext';
@@ -174,7 +174,7 @@ function AllFeatures() {
   const initialRows = Route.useLoaderData();
   const [rows, setRows] = useState(initialRows);
   const [selectedRows, setSelectedRows] = useState((): ReadonlySet<string> => new Set());
-  const [copiedCell, setCopiedCell] = useState<{ row: Row; column: CalculatedColumn<R> } | null>(
+  const [copiedCell, setCopiedCell] = useState<{ row: Row; column: CalculatedColumn<Row> } | null>(
     null
   );
 
@@ -182,27 +182,13 @@ function AllFeatures() {
     return { ...targetRow, [columnKey]: sourceRow[columnKey as keyof Row] };
   }
 
-  function handleCellPaste({ row, column }: CellCopyPasteEvent<Row>): Row {
-    if (!copiedCell) {
-      return row;
-    }
-
-    const sourceColumnKey = copiedCell.column.key;
-    const sourceRow = copiedCell.row;
+  function handleCellPaste(
+    { row, column }: CellCopyPasteEvent<Row>,
+    event: React.ClipboardEvent<HTMLDivElement>
+  ): Row {
     const targetColumnKey = column.key;
 
-    const incompatibleColumns = ['email', 'zipCode', 'date'];
-    if (
-      sourceColumnKey === 'avatar' ||
-      ['id', 'avatar'].includes(targetColumnKey) ||
-      ((incompatibleColumns.includes(targetColumnKey) ||
-        incompatibleColumns.includes(sourceColumnKey)) &&
-        sourceColumnKey !== targetColumnKey)
-    ) {
-      return row;
-    }
-
-    return { ...row, [targetColumnKey]: sourceRow[sourceColumnKey as keyof Row] };
+    return { ...row, [targetColumnKey]: event.clipboardData.getData('text/plain') };
   }
 
   function handleCellCopy(

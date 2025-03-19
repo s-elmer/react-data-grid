@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { page, userEvent } from '@vitest/browser/context';
 
-import DataGrid from '../../../src';
+import { DataGrid } from '../../../src';
 import type { Column } from '../../../src';
+import defaultRenderHeaderCell from '../../../src/renderHeaderCell';
 import { getCells, getCellsAtRowIndexOld, setup } from '../utils';
 
 interface Row {
@@ -95,8 +96,7 @@ describe('Custom cell renderer', () => {
     await expect.element(cell).toHaveTextContent('value: 1');
     await userEvent.click(page.getByRole('button'));
     await expect.element(cell).toHaveTextContent('value: 2');
-    expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith([{ id: 2 }], {
+    expect(onChange).toHaveBeenCalledExactlyOnceWith([{ id: 2 }], {
       column: {
         ...column,
         frozen: false,
@@ -108,7 +108,8 @@ describe('Custom cell renderer', () => {
         resizable: false,
         sortable: false,
         draggable: false,
-        width: 'auto'
+        width: 'auto',
+        renderHeaderCell: defaultRenderHeaderCell
       },
       indexes: [0]
     });
